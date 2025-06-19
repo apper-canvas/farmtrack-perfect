@@ -31,7 +31,7 @@ const Farms = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+const loadData = async () => {
     setLoading(true);
     setError(null);
     
@@ -41,11 +41,27 @@ const Farms = () => {
         cropService.getAll()
       ]);
       
-      setFarms(farmsData);
-      setCrops(cropsData);
+      // Extract data arrays from service responses and provide fallbacks
+      const farmsArray = farmsData?.data || [];
+      const cropsArray = cropsData?.data || [];
+      
+      // Validate that we received arrays
+      if (!Array.isArray(farmsArray)) {
+        throw new Error('Invalid farms data received from service');
+      }
+      if (!Array.isArray(cropsArray)) {
+        throw new Error('Invalid crops data received from service');
+      }
+      
+      setFarms(farmsArray);
+      setCrops(cropsArray);
     } catch (err) {
+      console.error('Error loading farms data:', err);
       setError(err.message || 'Failed to load farms');
       toast.error('Failed to load farms');
+      // Set empty arrays as fallbacks to prevent filter errors
+      setFarms([]);
+      setCrops([]);
     } finally {
       setLoading(false);
     }
