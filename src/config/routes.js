@@ -2,7 +2,6 @@ import Dashboard from '@/components/pages/Dashboard';
 import Farms from '@/components/pages/Farms';
 import Crops from '@/components/pages/Crops';
 import Tasks from '@/components/pages/Tasks';
-import Finance from '@/components/pages/Finance';
 import Weather from '@/components/pages/Weather';
 
 export const routes = {
@@ -33,13 +32,6 @@ export const routes = {
     path: '/tasks',
     icon: 'CheckSquare',
     component: Tasks
-  },
-  finance: {
-    id: 'finance',
-    label: 'Finance',
-    path: '/finance',
-    icon: 'DollarSign',
-    component: Finance
   },
   weather: {
     id: 'weather',
