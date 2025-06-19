@@ -28,7 +28,7 @@ useEffect(() => {
       
       try {
         console.log('Loading dashboard data...');
-        const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
+        const [farmsData, cropsData, tasksData, transactionsData] = await Promise.all([
           farmService.getAll(),
           cropService.getAll(),
           taskService.getAll(),
@@ -36,33 +36,27 @@ useEffect(() => {
         ]);
         
         console.log('Service responses:', {
-          farms: farmsResponse,
-          crops: cropsResponse,
-          tasks: tasksResponse,
-          transactions: transactionsResponse
+          farms: farmsData,
+          crops: cropsData,
+          tasks: tasksData,
+          transactions: transactionsData
         });
         
-        // Check for API errors and extract data
-        if (!farmsResponse?.success) {
-          throw new Error(farmsResponse?.error || 'Failed to load farms data');
+        // Validate that services returned arrays and handle potential errors
+        if (!Array.isArray(farmsData)) {
+          throw new Error('Invalid farms data format received');
         }
-        if (!cropsResponse?.success) {
-          throw new Error(cropsResponse?.error || 'Failed to load crops data');
+        if (!Array.isArray(cropsData)) {
+          throw new Error('Invalid crops data format received');
         }
-        if (!tasksResponse?.success) {
-          throw new Error(tasksResponse?.error || 'Failed to load tasks data');
+        if (!Array.isArray(tasksData)) {
+          throw new Error('Invalid tasks data format received');
         }
-        if (!transactionsResponse?.success) {
-          throw new Error(transactionsResponse?.error || 'Failed to load transactions data');
+        if (!Array.isArray(transactionsData)) {
+          throw new Error('Invalid transactions data format received');
         }
         
-        // Extract data arrays from response objects
-        const farmsData = farmsResponse.data || [];
-        const cropsData = cropsResponse.data || [];
-        const tasksData = tasksResponse.data || [];
-        const transactionsData = transactionsResponse.data || [];
-        
-        console.log('Extracted data:', {
+        console.log('Data loaded successfully:', {
           farms: farmsData.length,
           crops: cropsData.length,
           tasks: tasksData.length,
