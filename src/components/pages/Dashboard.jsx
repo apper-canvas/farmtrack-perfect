@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { format, isToday } from 'date-fns';
-import DashboardStats from '@/components/organisms/DashboardStats';
-import TaskList from '@/components/organisms/TaskList';
-import WeatherWidget from '@/components/organisms/WeatherWidget';
-import Button from '@/components/atoms/Button';
-import Card from '@/components/atoms/Card';
-import SkeletonLoader from '@/components/molecules/SkeletonLoader';
-import ErrorState from '@/components/molecules/ErrorState';
-import { farmService, cropService, taskService ,transactionService } from '@/services';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { format, isToday } from "date-fns";
+import DashboardStats from "@/components/organisms/DashboardStats";
+import TaskList from "@/components/organisms/TaskList";
+import WeatherWidget from "@/components/organisms/WeatherWidget";
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
+import SkeletonLoader from "@/components/molecules/SkeletonLoader";
+import ErrorState from "@/components/molecules/ErrorState";
+import { cropService, farmService, taskService, transactionService } from "@/services";
 
 const Dashboard = () => {
   const [farms, setFarms] = useState([]);
@@ -21,34 +21,50 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+useEffect(() => {
     const loadDashboardData = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
+        farmService.getAll(),
+        cropService.getAll(),
+        taskService.getAll(),
+        transactionService.getAll()
+      ]);
       
-      try {
-        const [farmsData, cropsData, tasksData, transactionsData] = await Promise.all([
-          farmService.getAll(),
-          cropService.getAll(),
-          taskService.getAll(),
-          transactionService.getAll()
-        ]);
-        
-        setFarms(farmsData);
-        setCrops(cropsData);
-        setTasks(tasksData);
-        setTransactions(transactionsData);
-      } catch (err) {
-        setError(err.message || 'Failed to load dashboard data');
-        toast.error('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
+      // Check for API errors and extract data
+      if (!farmsResponse?.success) {
+        throw new Error(farmsResponse?.error || 'Failed to load farms data');
       }
-    };
-
-    loadDashboardData();
-  }, []);
-
+      if (!cropsResponse?.success) {
+        throw new Error(cropsResponse?.error || 'Failed to load crops data');
+      }
+      if (!tasksResponse?.success) {
+        throw new Error(tasksResponse?.error || 'Failed to load tasks data');
+      }
+      if (!transactionsResponse?.success) {
+        throw new Error(transactionsResponse?.error || 'Failed to load transactions data');
+      }
+      
+      // Extract data arrays from response objects
+      setFarms(farmsResponse.data || []);
+      setCrops(cropsResponse.data || []);
+      setTasks(tasksResponse.data || []);
+      setTransactions(transactionsResponse.data || []);
+      
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+};
+  
+  loadDashboardData();
+}, []);
   const handleTaskToggle = async (task) => {
     try {
       const newStatus = task.status === 'completed' ? 'pending' : 'completed';
@@ -125,30 +141,31 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
-  return (
+return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       className="p-6 max-w-7xl mx-auto"
     >
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Dashboard
         </h1>
         <p className="text-gray-600">
-          Welcome back! Here's an overview of your farm operations.
+          Welcome back! Here's what's happening on your farm today.
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <DashboardStats
-        totalFarms={totalFarms}
-        activeCrops={activeCrops}
-        pendingTasks={pendingTasks}
-        monthlyBalance={monthlyBalance}
-        className="mb-8"
-      />
+      {/* Dashboard Stats */}
+      <div className="mb-8">
+        <DashboardStats
+          totalFarms={totalFarms}
+          activeCrops={activeCrops}
+          pendingTasks={pendingTasks}
+          monthlyBalance={monthlyBalance}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Today's Tasks */}
