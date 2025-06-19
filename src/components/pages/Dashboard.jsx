@@ -27,12 +27,20 @@ useEffect(() => {
       setError(null);
       
       try {
+        console.log('Loading dashboard data...');
         const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
           farmService.getAll(),
           cropService.getAll(),
           taskService.getAll(),
           transactionService.getAll()
         ]);
+        
+        console.log('Service responses:', {
+          farms: farmsResponse,
+          crops: cropsResponse,
+          tasks: tasksResponse,
+          transactions: transactionsResponse
+        });
         
         // Check for API errors and extract data
         if (!farmsResponse?.success) {
@@ -49,15 +57,28 @@ useEffect(() => {
         }
         
         // Extract data arrays from response objects
-        setFarms(farmsResponse.data || []);
-        setCrops(cropsResponse.data || []);
-        setTasks(tasksResponse.data || []);
-        setTransactions(transactionsResponse.data || []);
+        const farmsData = farmsResponse.data || [];
+        const cropsData = cropsResponse.data || [];
+        const tasksData = tasksResponse.data || [];
+        const transactionsData = transactionsResponse.data || [];
+        
+        console.log('Extracted data:', {
+          farms: farmsData.length,
+          crops: cropsData.length,
+          tasks: tasksData.length,
+          transactions: transactionsData.length
+        });
+        
+        setFarms(farmsData);
+        setCrops(cropsData);
+        setTasks(tasksData);
+        setTransactions(transactionsData);
         
       } catch (error) {
         console.error('Error loading dashboard data:', error);
-        setError('Failed to load dashboard data. Please try again.');
-        toast.error('Failed to load dashboard data');
+        const errorMessage = error.message || 'Failed to load dashboard data. Please try again.';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
