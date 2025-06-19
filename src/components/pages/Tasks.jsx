@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import { format } from 'date-fns';
-import TaskList from '@/components/organisms/TaskList';
-import Button from '@/components/atoms/Button';
-import Card from '@/components/atoms/Card';
-import FormField from '@/components/molecules/FormField';
-import SearchBar from '@/components/molecules/SearchBar';
-import SkeletonLoader from '@/components/molecules/SkeletonLoader';
-import ErrorState from '@/components/molecules/ErrorState';
-import EmptyState from '@/components/molecules/EmptyState';
-import { taskService, farmService, cropService } from '@/services';
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { format } from "date-fns";
+import TaskList from "@/components/organisms/TaskList";
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
+import FormField from "@/components/molecules/FormField";
+import SearchBar from "@/components/molecules/SearchBar";
+import SkeletonLoader from "@/components/molecules/SkeletonLoader";
+import ErrorState from "@/components/molecules/ErrorState";
+import EmptyState from "@/components/molecules/EmptyState";
+import { cropService, farmService, taskService } from "@/services";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -36,7 +36,7 @@ const Tasks = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+const loadData = async () => {
     setLoading(true);
     setError(null);
     
@@ -47,10 +47,15 @@ const Tasks = () => {
         cropService.getAll()
       ]);
       
-      setTasks(tasksData);
-      setFarms(farmsData);
-      setCrops(cropsData);
+      // Ensure data is arrays to prevent runtime errors
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
+      setFarms(Array.isArray(farmsData) ? farmsData : []);
+      setCrops(Array.isArray(cropsData) ? cropsData : []);
     } catch (err) {
+      // Reset to empty arrays on error to prevent crashes
+      setTasks([]);
+      setFarms([]);
+      setCrops([]);
       setError(err.message || 'Failed to load tasks');
       toast.error('Failed to load tasks');
     } finally {
@@ -208,201 +213,166 @@ const Tasks = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-6 max-w-7xl mx-auto"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+    initial={{
+        opacity: 0,
+        y: 20
+    }}
+    animate={{
+        opacity: 1,
+        y: 0
+    }}
+    className="p-6 max-w-7xl mx-auto">
+    {/* Header */}
+    <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Tasks</h1>
-          <p className="text-gray-600">
-            Manage your farm tasks and track their completion
-          </p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Tasks</h1>
+            <p className="text-gray-600">Manage your farm tasks and track their completion
+                          </p>
         </div>
         <Button
-          variant="primary"
-          icon="Plus"
-          onClick={() => setShowAddForm(true)}
-          disabled={farms.length === 0}
-        >
-          Add Task
-        </Button>
-      </div>
-
-      {farms.length === 0 ? (
-        <EmptyState
-          icon="MapPin"
-          title="No farms available"
-          description="You need to add a farm before you can create tasks"
-          actionLabel="Add Your First Farm"
-          onAction={() => window.location.href = '/farms'}
-        />
-      ) : (
-        <>
-          {/* Search Bar */}
-          <div className="mb-6">
+            variant="primary"
+            icon="Plus"
+            onClick={() => setShowAddForm(true)}
+            disabled={farms.length === 0}>Add Task
+                    </Button>
+    </div>
+    {farms.length === 0 ? <EmptyState
+        icon="MapPin"
+        title="No farms available"
+        description="You need to add a farm before you can create tasks"
+        actionLabel="Add Your First Farm"
+        onAction={() => window.location.href = "/farms"} /> : <>
+        {/* Search Bar */}
+        <div className="mb-6">
             <SearchBar
-              placeholder="Search tasks by title or description..."
-              onSearch={setSearchTerm}
-              className="max-w-md"
-            />
-          </div>
-
-          {/* Add/Edit Form Modal */}
-          <AnimatePresence>
-            {showAddForm && (
-              <>
+                placeholder="Search tasks by title or description..."
+                onSearch={setSearchTerm}
+                className="max-w-md" />
+        </div>
+        {/* Add/Edit Form Modal */}
+        <AnimatePresence>
+            {showAddForm && <>
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/50 z-40"
-                  onClick={resetForm}
-                />
+                    initial={{
+                        opacity: 0
+                    }}
+                    animate={{
+                        opacity: 1
+                    }}
+                    exit={{
+                        opacity: 0
+                    }}
+                    className="fixed inset-0 bg-black/50 z-40"
+                    onClick={resetForm} />
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                >
-                  <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                    <form onSubmit={handleSubmit}>
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          {editingTask ? 'Edit Task' : 'Add New Task'}
-                        </h2>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          icon="X"
-                          onClick={resetForm}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          type="select"
-                          label="Farm"
-                          value={formData.farmId}
-                          onChange={(value) => {
-                            handleFormChange('farmId', value);
-                            handleFormChange('cropId', ''); // Reset crop selection
-                          }}
-                          options={farmOptions}
-                          error={formErrors.farmId}
-                          required
-                        />
-
-                        <FormField
-                          type="select"
-                          label="Crop (Optional)"
-                          value={formData.cropId}
-                          onChange={(value) => handleFormChange('cropId', value)}
-                          options={cropOptions}
-                          disabled={!formData.farmId}
-                        />
-
-                        <div className="md:col-span-2">
-                          <FormField
-                            label="Task Title"
-                            value={formData.title}
-                            onChange={(value) => handleFormChange('title', value)}
-                            error={formErrors.title}
-                            required
-                            placeholder="e.g., Water tomato plants, Apply fertilizer"
-                          />
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <FormField
-                            type="textarea"
-                            label="Description"
-                            value={formData.description}
-                            onChange={(value) => handleFormChange('description', value)}
-                            placeholder="Optional task details..."
-                          />
-                        </div>
-
-                        <FormField
-                          type="date"
-                          label="Due Date"
-                          value={formData.dueDate}
-                          onChange={(value) => handleFormChange('dueDate', value)}
-                          error={formErrors.dueDate}
-                          required
-                        />
-
-                        <FormField
-                          type="select"
-                          label="Priority"
-                          value={formData.priority}
-                          onChange={(value) => handleFormChange('priority', value)}
-                          options={priorityOptions}
-                          required
-                        />
-
-                        {editingTask && (
-                          <div className="md:col-span-2">
-                            <FormField
-                              type="select"
-                              label="Status"
-                              value={formData.status}
-                              onChange={(value) => handleFormChange('status', value)}
-                              options={statusOptions}
-                              required
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex space-x-3 mt-6">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={resetForm}
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="submit"
-                          variant="primary"
-                          className="flex-1"
-                        >
-                          {editingTask ? 'Update Task' : 'Create Task'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Card>
+                    initial={{
+                        opacity: 0,
+                        scale: 0.95
+                    }}
+                    animate={{
+                        opacity: 1,
+                        scale: 1
+                    }}
+                    exit={{
+                        opacity: 0,
+                        scale: 0.95
+                    }}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <form onSubmit={handleSubmit}>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold text-gray-900">
+                                    {editingTask ? "Edit Task" : "Add New Task"}
+                                </h2>
+                                <Button type="button" variant="ghost" size="sm" icon="X" onClick={resetForm} />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    type="select"
+                                    label="Farm"
+                                    value={formData.farmId}
+                                    onChange={value => {
+                                        handleFormChange("farmId", value);
+                                        handleFormChange("cropId", "");
+                                    }}
+                                    options={farmOptions}
+                                    error={formErrors.farmId}
+                                    required />
+                                <FormField
+                                    type="select"
+                                    label="Crop (Optional)"
+                                    value={formData.cropId}
+                                    onChange={value => handleFormChange("cropId", value)}
+                                    options={cropOptions}
+                                    disabled={!formData.farmId} />
+                                <div className="md:col-span-2">
+                                    <FormField
+                                        label="Task Title"
+                                        value={formData.title}
+                                        onChange={value => handleFormChange("title", value)}
+                                        error={formErrors.title}
+                                        required
+                                        placeholder="e.g., Water tomato plants, Apply fertilizer" />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <FormField
+                                        type="textarea"
+                                        label="Description"
+                                        value={formData.description}
+                                        onChange={value => handleFormChange("description", value)}
+                                        placeholder="Optional task details..." />
+                                </div>
+                                <FormField
+                                    type="date"
+                                    label="Due Date"
+                                    value={formData.dueDate}
+                                    onChange={value => handleFormChange("dueDate", value)}
+                                    error={formErrors.dueDate}
+                                    required />
+                                <FormField
+                                    type="select"
+                                    label="Priority"
+                                    value={formData.priority}
+                                    onChange={value => handleFormChange("priority", value)}
+                                    options={priorityOptions}
+                                    required />
+                                {editingTask && <div className="md:col-span-2">
+                                    <FormField
+                                        type="select"
+                                        label="Status"
+                                        value={formData.status}
+                                        onChange={value => handleFormChange("status", value)}
+                                        options={statusOptions}
+                                        required />
+                                </div>}
+                            </div>
+                            <div className="flex space-x-3 mt-6">
+                                <Button type="button" variant="outline" onClick={resetForm} className="flex-1">Cancel
+                                                            </Button>
+                                <Button type="submit" variant="primary" className="flex-1">
+                                    {editingTask ? "Update Task" : "Create Task"}
+                                </Button>
+                            </div>
+                        </form>
+                    </Card>
                 </motion.div>
-              </>
-            )}
-          </AnimatePresence>
-
-          {/* Tasks List */}
-          {tasks.length === 0 ? (
-            <EmptyState
-              icon="CheckSquare"
-              title="No tasks created yet"
-              description="Create your first task to start managing your farm operations"
-              actionLabel="Create Your First Task"
-              onAction={() => setShowAddForm(true)}
-            />
-          ) : (
-            <TaskList
-              tasks={tasks}
-              farms={farms}
-              crops={crops}
-              onToggleComplete={handleToggleComplete}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          )}
-        </>
-      )}
-    </motion.div>
+            </>}
+        </AnimatePresence>
+        {/* Tasks List */}
+        {tasks.length === 0 ? <EmptyState
+            icon="CheckSquare"
+            title="No tasks created yet"
+            description="Create your first task to start managing your farm operations"
+            actionLabel="Create Your First Task"
+            onAction={() => setShowAddForm(true)} /> : <TaskList
+            tasks={tasks}
+            farms={farms}
+            crops={crops}
+            onToggleComplete={handleToggleComplete}
+            onEdit={handleEdit}
+            onDelete={handleDelete} />}
+    </>}
+</motion.div>
   );
 };
 
