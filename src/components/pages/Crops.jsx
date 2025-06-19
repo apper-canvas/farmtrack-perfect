@@ -38,21 +38,30 @@ const Crops = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+const loadData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const [cropsData, farmsData] = await Promise.all([
+      const [cropsResponse, farmsResponse] = await Promise.all([
         cropService.getAll(),
         farmService.getAll()
       ]);
       
-      setCrops(cropsData);
-      setFarms(farmsData);
+      // Handle service responses properly
+      if (cropsResponse.success && farmsResponse.success) {
+        setCrops(Array.isArray(cropsResponse.data) ? cropsResponse.data : []);
+        setFarms(Array.isArray(farmsResponse.data) ? farmsResponse.data : []);
+      } else {
+        const errorMsg = cropsResponse.error || farmsResponse.error || 'Failed to load data';
+        throw new Error(errorMsg);
+      }
     } catch (err) {
       setError(err.message || 'Failed to load crops');
       toast.error('Failed to load crops');
+      // Set empty arrays as fallback
+      setCrops([]);
+      setFarms([]);
     } finally {
       setLoading(false);
     }
@@ -92,7 +101,7 @@ const Crops = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -104,18 +113,34 @@ const Crops = () => {
       };
 
       if (editingCrop) {
-        const updatedCrop = await cropService.update(editingCrop.Id, cropData);
-        setCrops(crops.map(c => c.Id === editingCrop.Id ? updatedCrop : c));
-        toast.success('Crop updated successfully');
+        const response = await cropService.update(editingCrop.Id, cropData);
+        if (response.success && response.data) {
+          setCrops(prevCrops => 
+            Array.isArray(prevCrops) 
+              ? prevCrops.map(c => c.Id === editingCrop.Id ? response.data : c)
+              : [response.data]
+          );
+          toast.success('Crop updated successfully');
+        } else {
+          throw new Error(response.error || 'Failed to update crop');
+        }
       } else {
-        const newCrop = await cropService.create(cropData);
-        setCrops([...crops, newCrop]);
-        toast.success('Crop added successfully');
+        const response = await cropService.create(cropData);
+        if (response.success && response.data) {
+          setCrops(prevCrops => 
+            Array.isArray(prevCrops) 
+              ? [...prevCrops, response.data]
+              : [response.data]
+          );
+          toast.success('Crop added successfully');
+        } else {
+          throw new Error(response.error || 'Failed to create crop');
+        }
       }
 
       resetForm();
     } catch (err) {
-      toast.error(editingCrop ? 'Failed to update crop' : 'Failed to add crop');
+      toast.error(err.message || (editingCrop ? 'Failed to update crop' : 'Failed to add crop'));
     }
   };
 
@@ -134,14 +159,22 @@ const Crops = () => {
     setShowAddForm(true);
   };
 
-  const handleDelete = async (crop) => {
+const handleDelete = async (crop) => {
     if (window.confirm(`Are you sure you want to delete ${crop.name} (${crop.variety})?`)) {
       try {
-        await cropService.delete(crop.Id);
-        setCrops(crops.filter(c => c.Id !== crop.Id));
-        toast.success('Crop deleted successfully');
+        const response = await cropService.delete(crop.Id);
+        if (response.success) {
+          setCrops(prevCrops => 
+            Array.isArray(prevCrops) 
+              ? prevCrops.filter(c => c.Id !== crop.Id)
+              : []
+          );
+          toast.success('Crop deleted successfully');
+        } else {
+          throw new Error(response.error || 'Failed to delete crop');
+        }
       } catch (err) {
-        toast.error('Failed to delete crop');
+        toast.error(err.message || 'Failed to delete crop');
       }
     }
   };
