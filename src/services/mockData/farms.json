@@ -1,0 +1,34 @@
+[
+  {
+    "Id": 1,
+    "name": "Green Valley Farm",
+    "location": "Riverside County, CA",
+    "size": 150,
+    "sizeUnit": "acres",
+    "createdAt": "1/15/2024 8:00:00 AMZ"
+  },
+  {
+    "Id": 2,
+    "name": "Sunrise Orchards",
+    "location": "Fresno County, CA",
+    "size": 85,
+    "sizeUnit": "acres",
+    "createdAt": "2024-02-03T10:30:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "Heritage Homestead",
+    "location": "Sonoma County, CA",
+    "size": 45,
+    "sizeUnit": "acres",
+    "createdAt": "2024-02-20T14:15:00Z"
+  },
+  {
+    "Id": 4,
+    "name": "Prairie Wind Farm",
+    "location": "Kern County, CA",
+    "size": 200,
+    "sizeUnit": "acres",
+    "createdAt": "2024-03-01T09:45:00Z"
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "current": {
+    "location": "Riverside County, CA",
+    "temperature": 72,
+    "condition": "Partly Cloudy",
+    "humidity": 45,
+    "windSpeed": 8,
+    "windDirection": "SW",
+    "icon": "PartlyCloudyDay"
+  },
+  "forecast": [
+    {
+      "date": "2024-05-13",
+      "dayOfWeek": "Monday",
+      "high": 75,
+      "low": 58,
+      "condition": "Sunny",
+      "precipitation": 0,
+      "humidity": 40,
+      "windSpeed": 12,
+      "icon": "Sun"
+    },
+    {
+      "date": "2024-05-14",
+      "dayOfWeek": "Tuesday",
+      "high": 78,
+      "low": 61,
+      "condition": "Partly Cloudy",
+      "precipitation": 10,
+      "humidity": 48,
+      "windSpeed": 10,
+      "icon": "PartlyCloudyDay"
+    },
+    {
+      "date": "2024-05-15",
+      "dayOfWeek": "Wednesday",
+      "high": 73,
+      "low": 55,
+      "condition": "Light Rain",
+      "precipitation": 60,
+      "humidity": 70,
+      "windSpeed": 15,
+      "icon": "CloudRain"
+    },
+    {
+      "date": "2024-05-16",
+      "dayOfWeek": "Thursday",
+      "high": 71,
+      "low": 53,
+      "condition": "Cloudy",
+      "precipitation": 20,
+      "humidity": 65,
+      "windSpeed": 8,
+      "icon": "Cloud"
+    },
+    {
+      "date": "2024-05-17",
+      "dayOfWeek": "Friday",
+      "high": 76,
+      "low": 59,
+      "condition": "Sunny",
+      "precipitation": 0,
+      "humidity": 42,
+      "windSpeed": 11,
+      "icon": "Sun"
+    }
+  ],
+  "alerts": [
+    {
+      "type": "frost",
+      "severity": "watch",
+      "title": "Frost Watch",
+      "description": "Potential for frost conditions overnight Thursday into Friday morning",
+      "startDate": "2024-05-16T22:00:00Z",
+      "endDate": "2024-05-17T08:00:00Z"
+    }
+  ]
+}

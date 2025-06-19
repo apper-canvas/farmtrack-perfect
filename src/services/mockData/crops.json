@@ -1,0 +1,57 @@
+[
+  {
+    "Id": 1,
+    "farmId": 1,
+    "name": "Corn",
+    "variety": "Sweet Corn",
+    "fieldLocation": "North Field",
+    "plantingDate": "2024-03-15T00:00:00Z",
+    "expectedHarvest": "2024-07-15T00:00:00Z",
+    "status": "growing",
+    "notes": "Planted in rows 30 inches apart. Good germination rate."
+  },
+  {
+    "Id": 2,
+    "farmId": 1,
+    "name": "Tomatoes",
+    "variety": "Roma",
+    "fieldLocation": "South Field",
+    "plantingDate": "2024-04-01T00:00:00Z",
+    "expectedHarvest": "2024-08-01T00:00:00Z",
+    "status": "planted",
+    "notes": "Transplanted seedlings. Using drip irrigation."
+  },
+  {
+    "Id": 3,
+    "farmId": 2,
+    "name": "Apples",
+    "variety": "Fuji",
+    "fieldLocation": "Orchard Block A",
+    "plantingDate": "2024-02-01T00:00:00Z",
+    "expectedHarvest": "2024-09-15T00:00:00Z",
+    "status": "growing",
+    "notes": "Second year trees. Pruned in winter."
+  },
+  {
+    "Id": 4,
+    "farmId": 2,
+    "name": "Pears",
+    "variety": "Bartlett",
+    "fieldLocation": "Orchard Block B",
+    "plantingDate": "2024-02-15T00:00:00Z",
+    "expectedHarvest": "2024-09-01T00:00:00Z",
+    "status": "ready",
+    "notes": "Mature trees. Ready for harvest."
+  },
+  {
+    "Id": 5,
+    "farmId": 3,
+    "name": "Lettuce",
+    "variety": "Romaine",
+    "fieldLocation": "Greenhouse 1",
+    "plantingDate": "2024-04-10T00:00:00Z",
+    "expectedHarvest": "2024-06-01T00:00:00Z",
+    "status": "growing",
+    "notes": "Hydroponic system. Controlled environment."
+  }
+]

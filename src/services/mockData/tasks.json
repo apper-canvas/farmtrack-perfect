@@ -1,0 +1,62 @@
+[
+  {
+    "Id": 1,
+    "farmId": 1,
+    "cropId": 1,
+    "title": "Water Corn Field",
+    "description": "Deep watering of corn in North Field",
+    "dueDate": "2024-05-15T06:00:00Z",
+    "status": "pending",
+    "priority": "high"
+  },
+  {
+    "Id": 2,
+    "farmId": 1,
+    "cropId": 2,
+    "title": "Apply Fertilizer",
+    "description": "Apply organic fertilizer to tomato plants",
+    "dueDate": "2024-05-16T08:00:00Z",
+    "status": "pending",
+    "priority": "medium"
+  },
+  {
+    "Id": 3,
+    "farmId": 2,
+    "cropId": 3,
+    "title": "Pest Inspection",
+    "description": "Check apple trees for aphids and other pests",
+    "dueDate": "2024-05-14T10:00:00Z",
+    "status": "completed",
+    "priority": "high"
+  },
+  {
+    "Id": 4,
+    "farmId": 2,
+    "cropId": 4,
+    "title": "Harvest Pears",
+    "description": "Begin harvesting ripe Bartlett pears",
+    "dueDate": "2024-05-13T07:00:00Z",
+    "status": "pending",
+    "priority": "urgent"
+  },
+  {
+    "Id": 5,
+    "farmId": 3,
+    "cropId": 5,
+    "title": "Check pH Levels",
+    "description": "Test and adjust hydroponic solution pH",
+    "dueDate": "2024-05-17T09:00:00Z",
+    "status": "pending",
+    "priority": "medium"
+  },
+  {
+    "Id": 6,
+    "farmId": 1,
+    "cropId": null,
+    "title": "Equipment Maintenance",
+    "description": "Service tractor and irrigation system",
+    "dueDate": "2024-05-18T14:00:00Z",
+    "status": "pending",
+    "priority": "low"
+  }
+]
