@@ -5,6 +5,7 @@ const DashboardStats = ({
   totalFarms = 0,
   activeCrops = 0,
   pendingTasks = 0,
+  monthlyBalance = 0,
   loading = false,
   className = ''
 }) => {
@@ -28,6 +29,14 @@ const stats = [
       color: 'warning',
       trend: pendingTasks > 5 ? 'up' : 'down',
       trendValue: pendingTasks > 5 ? 'High' : 'Normal'
+    },
+    {
+      title: 'Monthly Balance',
+      value: `$${monthlyBalance.toFixed(2)}`,
+      icon: 'DollarSign',
+      color: monthlyBalance >= 0 ? 'success' : 'error',
+      trend: monthlyBalance >= 0 ? 'up' : 'down',
+      trendValue: monthlyBalance >= 0 ? 'Positive' : 'Negative'
     }
   ];
 

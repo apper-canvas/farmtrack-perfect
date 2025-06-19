@@ -31,7 +31,7 @@ useEffect(() => {
         const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
           farmService.getAll(),
           cropService.getAll(),
-          taskService.getAll(),
+taskService.getAll(),
           transactionService.getAll()
         ]);
         
@@ -192,7 +192,7 @@ return (
         </p>
       </div>
 
-      {/* Dashboard Stats */}
+{/* Dashboard Stats */}
       <div className="mb-8">
         <DashboardStats
           totalFarms={totalFarms}

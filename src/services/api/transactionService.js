@@ -1,64 +1,19 @@
+import mockTransactions from '@/services/mockData/transactions.json';
+
 // Transaction service for managing financial transactions
 class TransactionService {
   constructor() {
-    // Mock transaction data
-    this.transactions = [
-      {
-        id: 1,
-        type: 'income',
-        category: 'crop_sale',
-        amount: 2500.00,
-        description: 'Wheat harvest sale',
-        date: new Date('2024-01-15'),
-        farmId: 1
-      },
-      {
-        id: 2,
-        type: 'expense',
-        category: 'seeds',
-        amount: 450.00,
-        description: 'Corn seeds purchase',
-        date: new Date('2024-01-10'),
-        farmId: 1
-      },
-      {
-        id: 3,
-        type: 'income',
-        category: 'crop_sale',
-        amount: 1800.00,
-        description: 'Vegetable harvest',
-        date: new Date('2024-01-20'),
-        farmId: 2
-      },
-      {
-        id: 4,
-        type: 'expense',
-        category: 'fertilizer',
-        amount: 320.00,
-        description: 'Organic fertilizer',
-        date: new Date('2024-01-12'),
-        farmId: 1
-      },
-      {
-        id: 5,
-        type: 'expense',
-        category: 'equipment',
-        amount: 750.00,
-        description: 'Irrigation system maintenance',
-        date: new Date('2024-01-18'),
-        farmId: 2
-      }
-    ];
+    this.transactions = [...mockTransactions];
+    this.nextId = Math.max(...this.transactions.map(t => t.Id), 0) + 1;
   }
 
   // Get all transactions
   async getAll() {
     try {
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 300));
       return {
         success: true,
-        data: this.transactions
+        data: [...this.transactions]
       };
     } catch (error) {
       return {
@@ -68,20 +23,26 @@ class TransactionService {
     }
   }
 
-  // Get transactions by month and year
-  async getByMonth(month, year) {
+  // Get transaction by ID
+  async getById(id) {
     try {
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new Error('Invalid transaction ID');
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 200));
+      const transaction = this.transactions.find(t => t.Id === id);
       
-      const monthlyTransactions = this.transactions.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        return transactionDate.getMonth() === month && 
-               transactionDate.getFullYear() === year;
-      });
+      if (!transaction) {
+        return {
+          success: false,
+          error: 'Transaction not found'
+        };
+      }
 
       return {
         success: true,
-        data: monthlyTransactions
+        data: { ...transaction }
       };
     } catch (error) {
       return {
@@ -91,59 +52,26 @@ class TransactionService {
     }
   }
 
-  // Get recent transactions (last 5)
-  async getRecent(limit = 5) {
+  // Create new transaction
+  async create(transactionData) {
     try {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 400));
       
-      const sortedTransactions = [...this.transactions]
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, limit);
-
-      return {
-        success: true,
-        data: sortedTransactions
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  // Calculate monthly income
-  calculateMonthlyIncome(transactions) {
-    if (!Array.isArray(transactions)) return 0;
-    
-    return transactions
-      .filter(t => t.type === 'income')
-      .reduce((total, t) => total + (t.amount || 0), 0);
-  }
-
-  // Calculate monthly expenses
-  calculateMonthlyExpenses(transactions) {
-    if (!Array.isArray(transactions)) return 0;
-    
-    return transactions
-      .filter(t => t.type === 'expense')
-      .reduce((total, t) => total + (t.amount || 0), 0);
-  }
-
-  // Add new transaction
-  async add(transaction) {
-    try {
       const newTransaction = {
-        id: this.transactions.length + 1,
-        ...transaction,
-        date: new Date()
+        Id: this.nextId++,
+        type: transactionData.type,
+        category: transactionData.category,
+        amount: parseFloat(transactionData.amount),
+        description: transactionData.description,
+        date: transactionData.date || new Date().toISOString().split('T')[0],
+        farmId: transactionData.farmId || null
       };
       
       this.transactions.push(newTransaction);
       
       return {
         success: true,
-        data: newTransaction
+        data: { ...newTransaction }
       };
     } catch (error) {
       return {
@@ -156,19 +84,29 @@ class TransactionService {
   // Update transaction
   async update(id, updates) {
     try {
-      const index = this.transactions.findIndex(t => t.id === id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new Error('Invalid transaction ID');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      const index = this.transactions.findIndex(t => t.Id === id);
       if (index === -1) {
         throw new Error('Transaction not found');
       }
 
+      // Prevent Id field updates
+      const { Id, ...allowedUpdates } = updates;
+      
       this.transactions[index] = {
         ...this.transactions[index],
-        ...updates
+        ...allowedUpdates,
+        amount: allowedUpdates.amount ? parseFloat(allowedUpdates.amount) : this.transactions[index].amount
       };
 
       return {
         success: true,
-        data: this.transactions[index]
+        data: { ...this.transactions[index] }
       };
     } catch (error) {
       return {
@@ -181,7 +119,13 @@ class TransactionService {
   // Delete transaction
   async delete(id) {
     try {
-      const index = this.transactions.findIndex(t => t.id === id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new Error('Invalid transaction ID');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const index = this.transactions.findIndex(t => t.Id === id);
       if (index === -1) {
         throw new Error('Transaction not found');
       }
@@ -190,7 +134,87 @@ class TransactionService {
       
       return {
         success: true,
-        data: deleted
+        data: { ...deleted }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // Get transactions by filter
+  async getByFilter(filters = {}) {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 250));
+      
+      let filtered = [...this.transactions];
+      
+      if (filters.type) {
+        filtered = filtered.filter(t => t.type === filters.type);
+      }
+      
+      if (filters.category) {
+        filtered = filtered.filter(t => t.category === filters.category);
+      }
+      
+      if (filters.farmId) {
+        filtered = filtered.filter(t => t.farmId === filters.farmId);
+      }
+      
+      if (filters.dateFrom) {
+        filtered = filtered.filter(t => new Date(t.date) >= new Date(filters.dateFrom));
+      }
+      
+      if (filters.dateTo) {
+        filtered = filtered.filter(t => new Date(t.date) <= new Date(filters.dateTo));
+      }
+      
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filtered = filtered.filter(t => 
+          t.description.toLowerCase().includes(searchLower) ||
+          t.category.toLowerCase().includes(searchLower)
+        );
+      }
+
+      return {
+        success: true,
+        data: filtered
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // Get summary statistics
+  async getSummary(filters = {}) {
+    try {
+      const response = await this.getByFilter(filters);
+      if (!response.success) return response;
+      
+      const transactions = response.data;
+      
+      const income = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+        
+      const expenses = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      return {
+        success: true,
+        data: {
+          totalIncome: income,
+          totalExpenses: expenses,
+          netBalance: income - expenses,
+          transactionCount: transactions.length
+        }
       };
     } catch (error) {
       return {

@@ -1,0 +1,74 @@
+[
+  {
+    "Id": 1,
+    "type": "income",
+    "category": "crop_sale",
+    "amount": 2500.00,
+    "description": "Wheat harvest sale",
+    "date": "2024-01-15",
+    "farmId": 1
+  },
+  {
+    "Id": 2,
+    "type": "expense",
+    "category": "seeds",
+    "amount": 450.00,
+    "description": "Corn seeds purchase",
+    "date": "2024-01-10",
+    "farmId": 1
+  },
+  {
+    "Id": 3,
+    "type": "income",
+    "category": "crop_sale",
+    "amount": 1800.00,
+    "description": "Vegetable harvest",
+    "date": "2024-01-20",
+    "farmId": 2
+  },
+  {
+    "Id": 4,
+    "type": "expense",
+    "category": "fertilizer",
+    "amount": 320.00,
+    "description": "Organic fertilizer",
+    "date": "2024-01-12",
+    "farmId": 1
+  },
+  {
+    "Id": 5,
+    "type": "expense",
+    "category": "equipment",
+    "amount": 750.00,
+    "description": "Irrigation system maintenance",
+    "date": "2024-01-18",
+    "farmId": 2
+  },
+  {
+    "Id": 6,
+    "type": "income",
+    "category": "livestock",
+    "amount": 1200.00,
+    "description": "Cattle sale",
+    "date": "2024-01-25",
+    "farmId": 1
+  },
+  {
+    "Id": 7,
+    "type": "expense",
+    "category": "fuel",
+    "amount": 180.00,
+    "description": "Diesel for tractors",
+    "date": "2024-01-22",
+    "farmId": 2
+  },
+  {
+    "Id": 8,
+    "type": "expense",
+    "category": "labor",
+    "amount": 600.00,
+    "description": "Seasonal workers",
+    "date": "2024-01-28",
+    "farmId": 1
+  }
+]
