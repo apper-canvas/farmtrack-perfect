@@ -1,9 +1,27 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
 import { routeArray } from '@/config/routes';
 import WeatherWidget from '@/components/organisms/WeatherWidget';
+import { AuthContext } from '../App';
+
+const LogoutButton = () => {
+  const { logout } = useContext(AuthContext);
+  
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      icon="LogOut"
+      onClick={logout}
+      className="border-surface-300 text-gray-600 hover:text-gray-900"
+    >
+      Logout
+    </Button>
+  );
+};
 
 const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,10 +59,14 @@ const Layout = () => {
               </h1>
             </div>
           </div>
-          
-          {/* Weather Widget in Header */}
-          <div className="hidden md:block">
-            <WeatherWidget compact />
+<div className="flex items-center space-x-4">
+            {/* Weather Widget in Header */}
+            <div className="hidden md:block">
+              <WeatherWidget compact />
+            </div>
+            
+            {/* Logout Button */}
+            <LogoutButton />
           </div>
         </div>
       </header>
