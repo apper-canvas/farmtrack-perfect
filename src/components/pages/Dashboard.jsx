@@ -10,13 +10,12 @@ import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import SkeletonLoader from "@/components/molecules/SkeletonLoader";
 import ErrorState from "@/components/molecules/ErrorState";
-import { cropService, farmService, taskService, transactionService } from "@/services";
+import { cropService, farmService, taskService } from "@/services";
 
 const Dashboard = () => {
-  const [farms, setFarms] = useState([]);
+const [farms, setFarms] = useState([]);
   const [crops, setCrops] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -26,23 +25,21 @@ useEffect(() => {
       setLoading(true);
       setError(null);
       
-      try {
+try {
         console.log('Loading dashboard data...');
-        const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
+        const [farmsResponse, cropsResponse, tasksResponse] = await Promise.all([
           farmService.getAll(),
           cropService.getAll(),
-taskService.getAll(),
-          transactionService.getAll()
+          taskService.getAll()
         ]);
         
         console.log('Service responses:', {
           farms: farmsResponse,
           crops: cropsResponse,
-          tasks: tasksResponse,
-          transactions: transactionsResponse
+          tasks: tasksResponse
         });
         
-        // Check if any service calls failed
+// Check if any service calls failed
         if (!farmsResponse.success) {
           throw new Error(farmsResponse.error || 'Failed to load farms data');
         }
@@ -52,15 +49,11 @@ taskService.getAll(),
         if (!tasksResponse.success) {
           throw new Error(tasksResponse.error || 'Failed to load tasks data');
         }
-        if (!transactionsResponse.success) {
-          throw new Error(transactionsResponse.error || 'Failed to load transactions data');
-        }
         
-        // Extract data arrays from service responses
+// Extract data arrays from service responses
         const farmsData = farmsResponse.data || [];
         const cropsData = cropsResponse.data || [];
         const tasksData = tasksResponse.data || [];
-        const transactionsData = transactionsResponse.data || [];
         
         // Validate that services returned arrays and handle potential errors
         if (!Array.isArray(farmsData)) {
@@ -72,21 +65,16 @@ taskService.getAll(),
         if (!Array.isArray(tasksData)) {
           throw new Error('Invalid tasks data format received');
         }
-        if (!Array.isArray(transactionsData)) {
-          throw new Error('Invalid transactions data format received');
-        }
         
-        console.log('Data loaded successfully:', {
+console.log('Data loaded successfully:', {
           farms: farmsData.length,
           crops: cropsData.length,
-          tasks: tasksData.length,
-          transactions: transactionsData.length
+          tasks: tasksData.length
         });
         
         setFarms(farmsData);
         setCrops(cropsData);
         setTasks(tasksData);
-        setTransactions(transactionsData);
         
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -148,33 +136,11 @@ taskService.getAll(),
     );
   }
 
-  // Calculate dashboard metrics
+// Calculate dashboard metrics
   const totalFarms = farms.length;
   const activeCrops = crops.filter(c => c.status !== 'harvested').length;
   const pendingTasks = tasks.filter(t => t.status === 'pending').length;
   const todaysTasks = tasks.filter(t => isToday(new Date(t.dueDate)) && t.status === 'pending');
-  
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-  const monthlyTransactions = transactions.filter(t => {
-    const date = new Date(t.date);
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-  });
-  
-  const monthlyIncome = monthlyTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const monthlyExpenses = monthlyTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const monthlyBalance = monthlyIncome - monthlyExpenses;
-
-  // Recent transactions (last 5)
-  const recentTransactions = transactions
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
 
 return (
     <motion.div
@@ -194,11 +160,11 @@ return (
 
 {/* Dashboard Stats */}
       <div className="mb-8">
-        <DashboardStats
+<DashboardStats
           totalFarms={totalFarms}
           activeCrops={activeCrops}
           pendingTasks={pendingTasks}
-          monthlyBalance={monthlyBalance}
+          monthlyBalance={0}
         />
       </div>
 
@@ -248,50 +214,10 @@ return (
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Weather Widget */}
+{/* Weather Widget */}
           <WeatherWidget />
 
-          {/* Recent Transactions */}
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Recent Transactions
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/finance')}
-              >
-                View All
-              </Button>
-            </div>
-            
-            {recentTransactions.length > 0 ? (
-              <div className="space-y-3">
-                {recentTransactions.map((transaction) => (
-                  <div key={transaction.Id} className="flex items-center justify-between py-2 border-b border-surface-100 last:border-b-0">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {transaction.description}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {format(new Date(transaction.date), 'MMM dd')} • {transaction.category}
-                      </div>
-                    </div>
-                    <div className={`text-sm font-medium ${
-                      transaction.type === 'income' ? 'text-success' : 'text-error'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p className="text-sm">No recent transactions</p>
-              </div>
-            )}
-          </Card>
+          {/* Quick Actions */}
 
           {/* Quick Actions */}
           <Card>
@@ -315,16 +241,7 @@ return (
                 onClick={() => navigate('/crops')}
                 className="w-full justify-start"
               >
-                Log New Crop
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                icon="DollarSign"
-                onClick={() => navigate('/finance')}
-                className="w-full justify-start"
-              >
-                Add Transaction
+Add New Crop
               </Button>
             </div>
           </Card>
