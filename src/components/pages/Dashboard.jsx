@@ -23,48 +23,48 @@ const Dashboard = () => {
 
 useEffect(() => {
     const loadDashboardData = async () => {
-    setLoading(true)
-    setError(null)
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
+          farmService.getAll(),
+          cropService.getAll(),
+          taskService.getAll(),
+          transactionService.getAll()
+        ]);
+        
+        // Check for API errors and extract data
+        if (!farmsResponse?.success) {
+          throw new Error(farmsResponse?.error || 'Failed to load farms data');
+        }
+        if (!cropsResponse?.success) {
+          throw new Error(cropsResponse?.error || 'Failed to load crops data');
+        }
+        if (!tasksResponse?.success) {
+          throw new Error(tasksResponse?.error || 'Failed to load tasks data');
+        }
+        if (!transactionsResponse?.success) {
+          throw new Error(transactionsResponse?.error || 'Failed to load transactions data');
+        }
+        
+        // Extract data arrays from response objects
+        setFarms(farmsResponse.data || []);
+        setCrops(cropsResponse.data || []);
+        setTasks(tasksResponse.data || []);
+        setTransactions(transactionsResponse.data || []);
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        setError('Failed to load dashboard data. Please try again.');
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    try {
-      const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
-        farmService.getAll(),
-        cropService.getAll(),
-        taskService.getAll(),
-        transactionService.getAll()
-      ]);
-      
-      // Check for API errors and extract data
-      if (!farmsResponse?.success) {
-        throw new Error(farmsResponse?.error || 'Failed to load farms data');
-      }
-      if (!cropsResponse?.success) {
-        throw new Error(cropsResponse?.error || 'Failed to load crops data');
-      }
-      if (!tasksResponse?.success) {
-        throw new Error(tasksResponse?.error || 'Failed to load tasks data');
-      }
-      if (!transactionsResponse?.success) {
-        throw new Error(transactionsResponse?.error || 'Failed to load transactions data');
-      }
-      
-      // Extract data arrays from response objects
-      setFarms(farmsResponse.data || []);
-      setCrops(cropsResponse.data || []);
-      setTasks(tasksResponse.data || []);
-      setTransactions(transactionsResponse.data || []);
-      
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-      setError('Failed to load dashboard data. Please try again.');
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-};
-  
-  loadDashboardData();
-}, []);
+    loadDashboardData();
+  }, []);
   const handleTaskToggle = async (task) => {
     try {
       const newStatus = task.status === 'completed' ? 'pending' : 'completed';
