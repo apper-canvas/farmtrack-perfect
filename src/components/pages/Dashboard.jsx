@@ -10,7 +10,7 @@ import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import SkeletonLoader from '@/components/molecules/SkeletonLoader';
 import ErrorState from '@/components/molecules/ErrorState';
-import { farmService, cropService, taskService, transactionService } from '@/services';
+import { farmService, cropService, taskService } from '@/services';
 
 const Dashboard = () => {
   const [farms, setFarms] = useState([]);
