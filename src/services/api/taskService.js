@@ -6,53 +6,79 @@ let tasks = [...taskData];
 
 const taskService = {
   async getAll() {
-    await delay(300);
-    return [...tasks];
+    try {
+      await delay(300);
+      const result = [...tasks];
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to fetch tasks' };
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    const task = tasks.find(t => t.Id === parseInt(id, 10));
-    if (!task) {
-      throw new Error('Task not found');
+    try {
+      await delay(200);
+      const task = tasks.find(t => t.Id === parseInt(id, 10));
+      if (!task) {
+        return { success: false, error: 'Task not found' };
+      }
+      return { success: true, data: { ...task } };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to fetch task' };
     }
-    return { ...task };
   },
 
   async getByFarmId(farmId) {
-    await delay(250);
-    return tasks.filter(t => t.farmId === parseInt(farmId, 10));
+    try {
+      await delay(250);
+      const result = tasks.filter(t => t.farmId === parseInt(farmId, 10));
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to fetch tasks by farm' };
+    }
   },
 
   async create(taskData) {
-    await delay(400);
-    const newTask = {
-      ...taskData,
-      Id: Math.max(...tasks.map(t => t.Id), 0) + 1
-    };
-    tasks.push(newTask);
-    return { ...newTask };
+    try {
+      await delay(400);
+      const newTask = {
+        ...taskData,
+        Id: Math.max(...tasks.map(t => t.Id), 0) + 1
+      };
+      tasks.push(newTask);
+      return { success: true, data: { ...newTask } };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to create task' };
+    }
   },
 
   async update(id, taskData) {
-    await delay(400);
-    const index = tasks.findIndex(t => t.Id === parseInt(id, 10));
-    if (index === -1) {
-      throw new Error('Task not found');
+    try {
+      await delay(400);
+      const index = tasks.findIndex(t => t.Id === parseInt(id, 10));
+      if (index === -1) {
+        return { success: false, error: 'Task not found' };
+      }
+      const updatedTask = { ...tasks[index], ...taskData };
+      tasks[index] = updatedTask;
+      return { success: true, data: { ...updatedTask } };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to update task' };
     }
-    const updatedTask = { ...tasks[index], ...taskData };
-    tasks[index] = updatedTask;
-    return { ...updatedTask };
   },
 
   async delete(id) {
-    await delay(300);
-    const index = tasks.findIndex(t => t.Id === parseInt(id, 10));
-    if (index === -1) {
-      throw new Error('Task not found');
+    try {
+      await delay(300);
+      const index = tasks.findIndex(t => t.Id === parseInt(id, 10));
+      if (index === -1) {
+        return { success: false, error: 'Task not found' };
+      }
+      tasks.splice(index, 1);
+      return { success: true, data: true };
+    } catch (error) {
+      return { success: false, error: error.message || 'Failed to delete task' };
     }
-    tasks.splice(index, 1);
-    return true;
   }
 };
 
