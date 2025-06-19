@@ -28,7 +28,7 @@ useEffect(() => {
       
       try {
         console.log('Loading dashboard data...');
-        const [farmsData, cropsData, tasksData, transactionsData] = await Promise.all([
+        const [farmsResponse, cropsResponse, tasksResponse, transactionsResponse] = await Promise.all([
           farmService.getAll(),
           cropService.getAll(),
           taskService.getAll(),
@@ -36,11 +36,31 @@ useEffect(() => {
         ]);
         
         console.log('Service responses:', {
-          farms: farmsData,
-          crops: cropsData,
-          tasks: tasksData,
-          transactions: transactionsData
+          farms: farmsResponse,
+          crops: cropsResponse,
+          tasks: tasksResponse,
+          transactions: transactionsResponse
         });
+        
+        // Check if any service calls failed
+        if (!farmsResponse.success) {
+          throw new Error(farmsResponse.error || 'Failed to load farms data');
+        }
+        if (!cropsResponse.success) {
+          throw new Error(cropsResponse.error || 'Failed to load crops data');
+        }
+        if (!tasksResponse.success) {
+          throw new Error(tasksResponse.error || 'Failed to load tasks data');
+        }
+        if (!transactionsResponse.success) {
+          throw new Error(transactionsResponse.error || 'Failed to load transactions data');
+        }
+        
+        // Extract data arrays from service responses
+        const farmsData = farmsResponse.data || [];
+        const cropsData = cropsResponse.data || [];
+        const tasksData = tasksResponse.data || [];
+        const transactionsData = transactionsResponse.data || [];
         
         // Validate that services returned arrays and handle potential errors
         if (!Array.isArray(farmsData)) {
