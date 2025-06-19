@@ -5,7 +5,7 @@ import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 import { routeArray } from '@/config/routes';
 import WeatherWidget from '@/components/organisms/WeatherWidget';
-import { AuthContext } from '../App';
+import { AuthContext } from './App';
 
 const LogoutButton = () => {
   const { logout } = useContext(AuthContext);
